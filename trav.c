@@ -74,7 +74,9 @@ void trav_next(TRAV *tree) {
 		/* Kludge for making the starting dir act like the others... */
 		tree->first_run = 0;
 		if(tree->flags & TRAV_DIRFIRST) {
-			tree->name[tree->name_comp - 1] = 0;
+			if(tree->name_comp > 1 || tree->name[0] != '/')
+				/* Truncate trailing '/' unless the path is "/" */
+				tree->name[tree->name_comp - 1] = 0;
 			if(fstat(dirfd(tree->dirstack[tree->stackbottom]), &tree->stat)) {
 				/* Shouldn't happen. */
 				tree->error = errno;
@@ -88,7 +90,10 @@ top:
 	if(!entry) {
 		if(!tree->ret_dir && tree->flags & TRAV_DIRLAST) {
 			/* Return the base name of this dir if requested */
-			tree->name[tree->name_comp - 1] = 0;
+			if(tree->name_comp == 1 && tree->name[0] == '/')
+				tree->name[tree->name_comp] = 0;
+			else
+				tree->name[tree->name_comp - 1] = 0;
 			tree->ret_dir = 1;
 			return;
 		}
