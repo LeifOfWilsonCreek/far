@@ -80,6 +80,8 @@ char *archname = 0;
 
 char *compress_gz = COMPRESS_GZ;
 char *compress_bz = COMPRESS_BZ;
+char *uncompress_gz = UNCOMPRESS_GZ;
+char *uncompress_bz = UNCOMPRESS_BZ;
 
 char *compress;
 char *uncompress;
@@ -1365,11 +1367,13 @@ int main(int argc, char **argv) {
 		  case 'j':
 			/* Pipe through gzip/gunzip */
 			compress = compress_bz;
+			uncompress = uncompress_bz;
 			bzip = 1;
 			break;
 		  case 'z':
 			/* Pipe through gzip/gunzip */
 			compress = compress_gz;
+			uncompress = uncompress_gz;
 			gzip = 1;
 			break;
 		  case 'Z':
@@ -1428,8 +1432,8 @@ int main(int argc, char **argv) {
 		}
 	}
 
-	/* Pipe through gzip/gunzip if requested. */
-	if(gzip) {
+	/* Pipe through gzip/gunzip/bzip/bunzip if requested. */
+	if(gzip || bzip) {
 		int pp[2];
 		pid_t child;
 
