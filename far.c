@@ -29,11 +29,18 @@
 #include "far.h"
 #include "trav.h"
 
-#ifndef COMPRESS
-#define COMPRESS "/usr/bin/gzip"
+#ifndef COMPRESS_GZ
+#define COMPRESS_GZ "/usr/bin/gzip"
 #endif
-#ifndef UNCOMPRESS
-#define UNCOMPRESS "/usr/bin/gunzip"
+#ifndef UNCOMPRESS_GZ
+#define UNCOMPRESS_GZ "/usr/bin/gunzip"
+#endif
+
+#ifndef COMPRESS_BZ
+#define COMPRESS_BZ "/usr/bin/bzip2"
+#endif
+#ifndef UNCOMPRESS_BZ
+#define UNCOMPRESS_BZ "/usr/bin/bunzip2"
 #endif
 
 // todo:
@@ -66,11 +73,18 @@ char insecure = 0;
 char preserve = 0;
 char verbose = 0;
 char gzip = 0;
+char bzip = 0;
 char stoperr = 0;
 char completion = 0;
 char *archname = 0;
-char *compress = COMPRESS;
-char *uncompress = UNCOMPRESS;
+
+char *compress_gz = COMPRESS_GZ;
+char *compress_bz = COMPRESS_BZ;
+
+char *compress;
+char *uncompress;
+
+
 
 int append_things(int archfd, char **files);
 
@@ -1262,6 +1276,7 @@ Options:
  -f	Read/write archive from/to the specified File instead of stdin/stdout
  -h	Follow all symbolic links (for -c, -r, -u)
  -i	\"Insecure mode\": follow/show .. components of pathnames (for -x and -t)
+ -j	(de)compress archive with bzip2
  -l	Lock files while they are archived (for -c, -r, -u)
  -ll	wait for a Lock on files instead of skipping them (includes -l)
  -p	Preserve uid and gid; make stored permissions override umask (for -x)
@@ -1271,7 +1286,7 @@ Options:
  -v	Verbose (lists files as they are added or extracted)
  -V	Show %% completion on each file (implies -v)
  -z	compress the archive using the default (de)compressor
-	(currently "COMPRESS" and "UNCOMPRESS")
+	(currently "COMPRESS_GZ" and "UNCOMPRESS_GZ")
  -Z	specifies which (de)compressor to pipe the archive through (implies -z)
 ", name);
 	exit(2);
@@ -1283,7 +1298,7 @@ extern int optind;
 int main(int argc, char **argv) {
 	int archfd, tmpint, ret;
 
-	while((tmpint = getopt(argc, argv, "cef:hilprtuUvVxzZ")) != -1) {
+	while((tmpint = getopt(argc, argv, "cef:hijlprtuUvVxzZ")) != -1) {
 		switch(tmpint) {
 		/* Actions */
 		  case 'c':
@@ -1347,8 +1362,14 @@ int main(int argc, char **argv) {
 			verbose = 1;
 			completion = 1;
 			break;
+		  case 'j':
+			/* Pipe through gzip/gunzip */
+			compress = compress_bz;
+			bzip = 1;
+			break;
 		  case 'z':
 			/* Pipe through gzip/gunzip */
+			compress = compress_gz;
 			gzip = 1;
 			break;
 		  case 'Z':
