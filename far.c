@@ -222,14 +222,18 @@ int append_file(int archfd, const char *file) {
 	struct flock flock;
 	struct stat sb;
 	struct far_header fhead;
-	char *ptr;
+	const char *ptr;
 	off_t tmpoff;
 
 	if(verbose)
 		fprintf(stderr, "%s\n", file);
 
 	/* Open */
+#ifdef O_NOFOLLOW
 	if((filefd = open(file, followsym ? O_RDONLY : O_RDONLY|O_NOFOLLOW, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)) == -1) {
+#else
+	if((filefd = open(file, O_RDONLY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)) == -1) {
+#endif
 		fprintf(stderr, "%s: open: %s\n", file, strerror(errno));
 		return 1;
 	}
@@ -337,7 +341,8 @@ int append_symlink(int archfd, const char *file) {
 	int tmpint, linksz;
 	struct stat sb;
 	struct far_header fhead;
-	char linkbuf[0x10000], *ptr;
+	char linkbuf[0x10000];
+	const char *ptr;
 
 	if(verbose)
 		fprintf(stderr, "%s\n", file);
@@ -428,7 +433,7 @@ int append_dir(int archfd, const char *file) {
 		}
 		if(S_ISDIR(tr->stat.st_mode)) {
 			struct far_header fhead;
-			char *ptr;
+			const char *ptr;
 
 			if(verbose)
 				fprintf(stderr, "%s\n", tr->name);
