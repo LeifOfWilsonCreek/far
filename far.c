@@ -1235,13 +1235,13 @@ void usage(char *name) {
 
 	fprintf(stderr,
 "Benefits of using the far (\"File ARchive\") format over tar:
- - the format is simpler, smaller, more CPU efficient, and explicitly defined
- - support for a file creation time, for systems that support it
- - not based on outdated tape drive hardware
+ - separate archives can be concatenated using the >> shell directive or cat
+ - archive appending is pipe-friendly
+ - support for files of length up to 2^64-1 bytes
+ - support for filenames of length up to 2^64-2 bytes
  - archives are more portable since there is only one version of the format
- - support for filenames and files of length up to 2^64-2 bytes
- - separate archives can be concatenated using the >> shell directive or cat,
-and archive appending is pipe-friendly
+ - support for a file creation time, for systems that support it
+ - the format is much simpler, slightly smaller, slightly more CPU efficient
 
 For familiarity, most of the options for this utility reflect the options
 provided by common tar utilities.
@@ -1255,7 +1255,7 @@ Actions: (Specify exactly one)
 Options:
  -e	stop after an Error
  -f	Read/write archive from/to the specified File instead of stdin/stdout
- -h	Follow all symbolic links (for -c)
+ -h	Follow all symbolic links (for -c, -r, -u)
  -i	\"Insecure mode\": follow/show .. components of pathnames (for -x and -t)
  -l	Lock files while they are archived (for -c, -r, -u)
  -ll	wait for a Lock on files instead of skipping them (includes -l)
